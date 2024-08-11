@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const ctx = document.getElementById('scoreChart').getContext('2d');
     const scoreForm = document.getElementById('scoreForm');
     const domainSelect = document.getElementById('domain');
@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to generate a random jitter value within a specified range
     function getJitter() {
-        return (Math.random() - 0.5) * 0.3; // Jitter value between -0.1 and 0.1
+        return (Math.random() - 0.5) * 0.2; // Jitter value between -0.1 and 0.1
     }
 
     let chartData = {
@@ -88,13 +88,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    scoreForm.addEventListener('submit', function(event) {
-        event.preventDefault();
-
-        const domain = domainSelect.value;
-        const value = parseFloat(document.querySelector('input[name="value"]:checked').value);
-        const feasibility = parseFloat(document.querySelector('input[name="feasibility"]:checked').value);
-
+    // Function to add a data point to the chart
+    function addDataToChart(domain, value, feasibility) {
         // Apply jitter to avoid overlapping points
         const jitteredValue = value + getJitter();
         const jitteredFeasibility = feasibility + getJitter();
@@ -125,15 +120,71 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Update the chart with the new data point
         scoreChart.update();
+    }
 
-        // Remove the selected domain from the dropdown options
-        const optionToRemove = domainSelect.querySelector(`option[value="${domain}"]`);
-        if (optionToRemove) {
-            optionToRemove.remove();
+    // Fetch data from the Baserow database and populate the chart
+    const databaseUrl = 'https://api.baserow.io/api/database/rows/table/337802/?user_field_names=true';
+    const token = 'xFalGLz7taK8tEcpD1Hsp9cuF1TTq4Ih'; // Replace with your actual token
+
+    try {
+        const response = await fetch(databaseUrl, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Token ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
         }
 
-        // Reset the form to the first available option and clear the radio buttons
-        scoreForm.reset();
-        domainSelect.selectedIndex = 0;
+        const data = await response.json();
+
+        data.results.forEach(item => {
+            addDataToChart(item.domain, item.value, item.feasibility);
+        });
+    } catch (error) {
+        console.error('There was a problem with the fetch operation:', error);
+    }
+
+    scoreForm.addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        const domain = domainSelect.value;
+        const value = parseFloat(document.querySelector('input[name="value"]:checked').value);
+        const feasibility = parseFloat(document.querySelector('input[name="feasibility"]:checked').value);
+
+        // Send data to the Baserow database
+        try {
+            const response = await fetch(databaseUrl, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Token ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    domain: domain,
+                    value: value,
+                    feasibility: feasibility
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const data = await response.json();
+            console.log('Data successfully sent to the database:', data);
+
+            // After successful POST, add the data to the chart
+            addDataToChart(domain, value, feasibility);
+
+            // Reset the form to the first available option and clear the radio buttons
+            scoreForm.reset();
+            domainSelect.selectedIndex = 0;
+        } catch (error) {
+            console.error('There was a problem with the fetch operation:', error);
+        }
     });
 });
