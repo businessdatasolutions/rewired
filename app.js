@@ -90,6 +90,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Function to add a data point to the chart
     function addDataToChart(domain, value, feasibility) {
+        console.log(`Adding data to chart: Domain=${domain}, Value=${value}, Feasibility=${feasibility}`);
+
         // Apply jitter to avoid overlapping points
         const jitteredValue = value + getJitter();
         const jitteredFeasibility = feasibility + getJitter();
@@ -105,7 +107,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 backgroundColor: domainColors[domain],
                 borderColor: domainColors[domain],
                 borderWidth: 1,
-                pointRadius: 8 // Increase the marker size
+                pointRadius: 8, // Increase the marker size
+                showLine: false // Ensure lines are not shown between points
             };
             chartData.datasets.push(dataset);
         }
@@ -117,6 +120,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             originalX: feasibility, // Store original feasibility score
             originalY: value // Store original value score
         });
+
+        console.log('Current dataset:', dataset);
 
         // Update the chart with the new data point
         scoreChart.update();
@@ -140,9 +145,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const data = await response.json();
+        console.log('Fetched data from database:', data);
 
         data.results.forEach(item => {
-            addDataToChart(item.domain, item.value, item.feasibility);
+            // Convert string values to numbers before adding to the chart
+            const value = parseFloat(item.value);
+            const feasibility = parseFloat(item.feasibility);
+
+            addDataToChart(item.domain, value, feasibility);
         });
     } catch (error) {
         console.error('There was a problem with the fetch operation:', error);
