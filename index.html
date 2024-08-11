@@ -25,14 +25,31 @@
                     <option value="Personalized Marketing">Personalized Marketing</option>
                 </select>
             </div>
+
             <div class="mb-4">
-                <label for="value" class="block text-sm font-medium text-gray-700">Value (0-5)</label>
-                <input type="number" id="value" name="value" min="0" max="5" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                <label class="block text-sm font-medium text-gray-700">Value (0-5)</label>
+                <div id="value" class="flex space-x-4 mt-2">
+                    <label><input type="radio" name="value" value="0" required> 0</label>
+                    <label><input type="radio" name="value" value="1"> 1</label>
+                    <label><input type="radio" name="value" value="2"> 2</label>
+                    <label><input type="radio" name="value" value="3"> 3</label>
+                    <label><input type="radio" name="value" value="4"> 4</label>
+                    <label><input type="radio" name="value" value="5"> 5</label>
+                </div>
             </div>
+
             <div class="mb-4">
-                <label for="feasibility" class="block text-sm font-medium text-gray-700">Feasibility (0-5)</label>
-                <input type="number" id="feasibility" name="feasibility" min="0" max="5" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                <label class="block text-sm font-medium text-gray-700">Feasibility (0-5)</label>
+                <div id="feasibility" class="flex space-x-4 mt-2">
+                    <label><input type="radio" name="feasibility" value="0" required> 0</label>
+                    <label><input type="radio" name="feasibility" value="1"> 1</label>
+                    <label><input type="radio" name="feasibility" value="2"> 2</label>
+                    <label><input type="radio" name="feasibility" value="3"> 3</label>
+                    <label><input type="radio" name="feasibility" value="4"> 4</label>
+                    <label><input type="radio" name="feasibility" value="5"> 5</label>
+                </div>
             </div>
+
             <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">Submit</button>
         </form>
 

@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const ctx = document.getElementById('scoreChart').getContext('2d');
     const scoreForm = document.getElementById('scoreForm');
+    const domainSelect = document.getElementById('domain');
 
     // Define colors for each domain
     const domainColors = {
@@ -15,16 +16,13 @@ document.addEventListener('DOMContentLoaded', () => {
         'Personalized Marketing': 'rgba(192, 75, 75, 0.6)',
     };
 
+    // Function to generate a random jitter value within a specified range
+    function getJitter() {
+        return (Math.random() - 0.5) * 0.3; // Jitter value between -0.1 and 0.1
+    }
+
     let chartData = {
-        labels: [],
-        datasets: [{
-            label: 'Business Domains',
-            data: [],
-            backgroundColor: [],
-            borderColor: [],
-            borderWidth: 1,
-            pointRadius: 8, // Increase the marker size
-        }]
+        datasets: []
     };
 
     const scoreChart = new Chart(ctx, {
@@ -47,16 +45,44 @@ document.addEventListener('DOMContentLoaded', () => {
                         display: true,
                         text: 'Feasibility'
                     },
-                    min: 0,
-                    max: 5
+                    min: 0, // Set minimum to 0
+                    max: 5, // Set maximum to 5
+                    ticks: {
+                        stepSize: 1, // Ensure tick marks only appear on whole numbers
+                        callback: function(value) {
+                            if (Number.isInteger(value)) {
+                                return value; // Show only whole numbers
+                            }
+                        }
+                    }
                 },
                 y: {
                     title: {
                         display: true,
                         text: 'Value'
                     },
-                    min: 0,
-                    max: 5
+                    min: 0, // Set minimum to 0
+                    max: 5, // Set maximum to 5
+                    ticks: {
+                        stepSize: 1, // Ensure tick marks only appear on whole numbers
+                        callback: function(value) {
+                            if (Number.isInteger(value)) {
+                                return value; // Show only whole numbers
+                            }
+                        }
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            // Retrieve the original scores from the dataset
+                            const originalValue = context.raw.originalY;
+                            const originalFeasibility = context.raw.originalX;
+                            return `Domain: ${context.dataset.label} (Value: ${originalValue}, Feasibility: ${originalFeasibility})`;
+                        }
+                    }
                 }
             }
         }
@@ -65,17 +91,49 @@ document.addEventListener('DOMContentLoaded', () => {
     scoreForm.addEventListener('submit', function(event) {
         event.preventDefault();
 
-        const domain = document.getElementById('domain').value;
-        const value = parseFloat(document.getElementById('value').value);
-        const feasibility = parseFloat(document.getElementById('feasibility').value);
+        const domain = domainSelect.value;
+        const value = parseFloat(document.querySelector('input[name="value"]:checked').value);
+        const feasibility = parseFloat(document.querySelector('input[name="feasibility"]:checked').value);
 
-        chartData.labels.push(domain);
-        chartData.datasets[0].data.push({ x: feasibility, y: value });
-        chartData.datasets[0].backgroundColor.push(domainColors[domain]);
-        chartData.datasets[0].borderColor.push(domainColors[domain]);
+        // Apply jitter to avoid overlapping points
+        const jitteredValue = value + getJitter();
+        const jitteredFeasibility = feasibility + getJitter();
 
+        // Check if the dataset for this domain already exists
+        let dataset = chartData.datasets.find(d => d.label === domain);
+
+        if (!dataset) {
+            // Create a new dataset for this domain
+            dataset = {
+                label: domain,
+                data: [],
+                backgroundColor: domainColors[domain],
+                borderColor: domainColors[domain],
+                borderWidth: 1,
+                pointRadius: 8 // Increase the marker size
+            };
+            chartData.datasets.push(dataset);
+        }
+
+        // Add the new data point to the dataset with jitter and original values
+        dataset.data.push({
+            x: jitteredFeasibility,
+            y: jitteredValue,
+            originalX: feasibility, // Store original feasibility score
+            originalY: value // Store original value score
+        });
+
+        // Update the chart with the new data point
         scoreChart.update();
 
+        // Remove the selected domain from the dropdown options
+        const optionToRemove = domainSelect.querySelector(`option[value="${domain}"]`);
+        if (optionToRemove) {
+            optionToRemove.remove();
+        }
+
+        // Reset the form to the first available option and clear the radio buttons
         scoreForm.reset();
+        domainSelect.selectedIndex = 0;
     });
 });
