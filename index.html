@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Innovation Scoring</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6">
+    <div class="max-w-xl mx-auto bg-white shadow-md rounded p-6">
+        <h1 class="text-2xl font-bold mb-4">Score Digital Innovation</h1>
+        <form id="scoreForm" class="mb-6">
+            <div class="mb-4">
+                <label for="domain" class="block text-sm font-medium text-gray-700">Business Domain</label>
+                <select id="domain" name="domain" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    <option value="Manufacturing">Manufacturing</option>
+                    <option value="Revenue Management">Revenue Management</option>
+                    <option value="Logistics">Logistics</option>
+                    <option value="Store Execution">Store Execution</option>
+                    <option value="Innovation/R&D">Innovation/R&D</option>
+                    <option value="Digital Engagement">Digital Engagement</option>
+                    <option value="Procurement">Procurement</option>
+                    <option value="Integrated Supply Chain Planning">Integrated Supply Chain Planning</option>
+                    <option value="Personalized Marketing">Personalized Marketing</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label for="value" class="block text-sm font-medium text-gray-700">Value (0-5)</label>
+                <input type="number" id="value" name="value" min="0" max="5" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            </div>
+            <div class="mb-4">
+                <label for="feasibility" class="block text-sm font-medium text-gray-700">Feasibility (0-5)</label>
+                <input type="number" id="feasibility" name="feasibility" min="0" max="5" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            </div>
+            <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">Submit</button>
+        </form>
+
+        <canvas id="scoreChart" width="400" height="400"></canvas>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
