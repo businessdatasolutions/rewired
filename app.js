@@ -190,6 +190,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             // After successful POST, add the data to the chart
             addDataToChart(domain, value, feasibility);
 
+            // Remove the selected domain from the dropdown options
+            const optionToRemove = domainSelect.querySelector(`option[value="${domain}"]`);
+            if (optionToRemove) {
+                optionToRemove.remove();
+            }
+
             // Reset the form to the first available option and clear the radio buttons
             scoreForm.reset();
             domainSelect.selectedIndex = 0;
